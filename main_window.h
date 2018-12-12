@@ -18,12 +18,14 @@ public:
 
 private slots:
     void on_btnConnect_clicked();
-    void on_btnVersion_clicked();
-    void on_btnSubmit_clicked();
+    void on_btnDisconnect_clicked();
+    void on_btnWrite_clicked();
+    void on_btnPlus_clicked();
+    void on_btnMinus_clicked();
 
 private:
     Ui::MainWindow *ui;
-    ReaderManager readerManager;
+    ReaderManager *readerManager;
     void closeEvent(QCloseEvent *bar);
 };
 

@@ -11,12 +11,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->readerManager = ReaderManager();
+    this->readerManager = new ReaderManager();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete readerManager;
 }
 
 void MainWindow::closeEvent (QCloseEvent *event)
@@ -28,28 +29,65 @@ void MainWindow::closeEvent (QCloseEvent *event)
     if (resBtn != QMessageBox::Yes) {
         event->ignore();
     } else {
-        readerManager.disconnectReader();
         event->accept();
     }
 }
 
-
 void MainWindow::on_btnConnect_clicked()
 {
-    bool success = readerManager.connectReader();
-
-    ui->lblDisplay->setText(success?"Succeed":"Failed");
-    ui->lblDisplay->update();
+    int failed = readerManager->connectReader();
+    if(failed==0){
+        ui->btnConnect->setEnabled(false);
+        ui->btnConnect->update();
+        ui->btnDisconnect->setEnabled(true);
+        ui->btnDisconnect->update();
+        ui->txtVersion->setText(QString(readerManager->getVersion()));
+        ui->txtVersion->update();
+        ui->txtIdentity->setText(QString(readerManager->getId()));
+        ui->txtIdentity->update();
+    }
 }
 
-void MainWindow::on_btnVersion_clicked(){
-    int version = readerManager.getVersion();
-    ui->lblDisplay->setText(QString(version));
-    ui->lblDisplay->update();
-}
-
-void MainWindow::on_btnSubmit_clicked()
+void MainWindow::on_btnDisconnect_clicked()
 {
-    QString Text = ui->txtSaisie->toPlainText();
-    qDebug() << "Text : " << Text;
+    int failed = readerManager->disconnectReader();
+    if(failed==0){
+        ui->btnDisconnect->setEnabled(false);
+        ui->btnDisconnect->update();
+        ui->btnConnect->setEnabled(true);
+        ui->btnConnect->update();
+        ui->txtVersion->setText(QString(""));
+        ui->txtVersion->update();
+        ui->txtIdentity->setText(QString(""));
+        ui->txtIdentity->update();
+    }
+}
+
+void MainWindow::on_btnWrite_clicked()
+{
+    uint8_t data[16];
+    QString text = ui->txtWriteData->toPlainText();
+    for(int k = 0; k <16; k++){
+        data[k] = QChar(text[k]).unicode();
+    }
+
+    int sector = ui->txtSector->toPlainText().toInt();
+    int block = ui->txtBlock->toPlainText().toInt();
+    this->readerManager->write(sector,block,data);
+}
+
+void MainWindow::on_btnPlus_clicked(){
+    int sector = ui->txtSector->toPlainText().toInt();
+    int block = ui->txtBlock->toPlainText().toInt();
+    if (block == 14 && sector == 3){
+        readerManager->increment(block);
+    }
+
+}
+void MainWindow::on_btnMinus_clicked(){
+    int sector = ui->txtSector->toPlainText().toInt();
+    int block = ui->txtBlock->toPlainText().toInt();
+    if (block == 14 && sector == 3){
+        readerManager->decrement(block);
+    }
 }
