@@ -1,23 +1,32 @@
 #include "reader_manager.h"
 #include "MfErrNo.h"
 #include <QtGui>
-
-unsigned char key_ff[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-unsigned char KEY_A[6]  = {0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5};
-unsigned char KEY_B[6]  = {0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5};
-unsigned char KEY_C[6]  = {0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5};
-unsigned char KEY_D[6]  = {0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5};
+unsigned char KEY_FAKE[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+unsigned char KEY_A[6]  = {0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5}; // Lire Block 2
+unsigned char KEY_B[6]  = {0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5}; // Lire + Ecrire Block 2
+unsigned char KEY_C[6]  = {0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5}; // Lire + Increment + Transfert Block 3
+unsigned char KEY_D[6]  = {0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5}; // Lire + Decrement + Transfert Block 3
 
 ReaderManager::ReaderManager()
 {
+    this->uid_len=12;
+    this->uid = new uint8_t[uid_len];
+
+    this->block_size=16;
+    this->data=new uint8_t[block_size];
+
     this->reader = new ReaderName();
     this->reader->Type = ReaderCDC;
     this->reader->device = 0;
+
+    this->connected=false;
 }
 
 ReaderManager::~ReaderManager(){
     this->disconnectReader(); // Disconnect Reader
     delete this->reader;
+    delete uid;
+    delete data;
 }
 
 int ReaderManager::connectReader(){
@@ -41,9 +50,10 @@ int ReaderManager::connectReader(){
     }
     printf("Load Version [SUCCEED] %\n",status);
 
-    // Load Key
+    // Load Keys
     key_index = 0;
     status = Mf_Classic_LoadKey(reader, Auth_KeyA, KEY_A, key_index);
+
     if (status != MI_OK){
         printf("Load Key [FAILED]\n");
         return status;
@@ -70,6 +80,8 @@ int ReaderManager::connectReader(){
     for (int i = 0; i < uid_len; i++){
         printf("%02X", uid[i]);
     }
+    connected=true;
+    return status;
 }
 
 int ReaderManager::disconnectReader(){
@@ -91,6 +103,7 @@ int ReaderManager::disconnectReader(){
     }
     printf("CloseCom [SUCCEED] %\n",status);
 
+    connected=false;
     return status;
 }
 
@@ -106,8 +119,54 @@ void ReaderManager::decrement(int block){
     status = Mf_Classic_Restore_Value(reader, FALSE, block -1, block , Auth_KeyA, 0);
 }
 
+int ReaderManager::read(int sector,int block){
+    unsigned char * KEY_ACCESS = getAccessKeyForSector(sector,false);
+
+    status = Mf_Classic_Authenticate(reader, Auth_KeyA, FALSE, sector, KEY_ACCESS, 0);
+    if (status != MI_OK){
+        printf("Auth [FAILED]\n");
+        return status;
+    }
+    printf("Auth [SUCCEED]\n");
+
+    status = Mf_Classic_Read_Block(reader, FALSE, block, data, Auth_KeyB, 0);
+    if (status != MI_OK){
+        printf("Read_Block [FAILED]\n");
+        return status;
+    }
+    printf("Read_Block [SUCCEED]\n");
+
+    return status;
+}
+
+int ReaderManager::write(int sector,int block,char* value){
+    // Changing data
+    for(int k = 0; k <16; k++){
+        data[k] = value[k];
+    }
+
+    unsigned char * KEY_ACCESS = getAccessKeyForSector(sector,true);
+
+    status = Mf_Classic_Authenticate(reader, Auth_KeyB, FALSE, sector, KEY_ACCESS, 0);
+    if (status != MI_OK){
+        printf("Auth [FAILED]\n");
+        return status;
+    }
+    printf("Auth [SUCCEED]\n");
+
+    status = Mf_Classic_Write_Block(reader, FALSE, block, data, Auth_KeyB, 0);
+    if (status != MI_OK){
+        printf("Write_Block [FAILED]\n");
+        return status;
+    }
+    printf("Write_Block [SUCCEED]\n");
+
+    return status;
+}
+
+
 char* ReaderManager::getId(){
-    char tmp[12];
+    char tmp[uid_len];
     for(int i=0;i<uid_len;i++){
         tmp[i]=(uid[i]==1)?'1':'0';
     }
@@ -118,13 +177,38 @@ char* ReaderManager::getVersion(){
     return version;
 }
 
-int ReaderManager::write(int sector,int block,uint8_t* data){
-    status = Mf_Classic_Authenticate(reader, Auth_KeyB, FALSE, sector, (sector == 2)?KEY_B:KEY_D, 0);
-    if (status != MI_OK){
-        printf("Auth Failed\n");
-        return status;
+/**
+ * @brief ReaderManager::getData
+ * @return value readable data
+ */
+char * ReaderManager::getData(){
+    char value[block_size];
+    for(int k = 0; k <block_size; k++){
+        value[k]=data[k];
     }
-    printf("Auth Succeed\n");
-
-    status = Mf_Classic_Write_Block(reader, FALSE, block, data, Auth_KeyB, 0);
+    return value;
 }
+
+unsigned char* ReaderManager::getAccessKeyForSector(int sector,bool writeAccess){
+    unsigned char *KEY_ACCESS;
+    switch(sector){
+    case 2 :
+        // Use KEY_B
+        KEY_ACCESS=(writeAccess)?KEY_B:KEY_A;
+        break;
+    case 3 :
+        // Use KEY_D
+        KEY_ACCESS=KEY_D;
+        break;
+    default :
+        KEY_ACCESS=KEY_FAKE;
+        break;
+    }
+    return KEY_ACCESS;
+}
+
+bool ReaderManager::isConnected(){
+    return this->connected;
+}
+
+

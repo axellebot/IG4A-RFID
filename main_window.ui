@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>585</width>
-    <height>311</height>
+    <width>808</width>
+    <height>245</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,10 +16,10 @@
   <widget class="QPushButton" name="btnConnect">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>10</y>
+     <x>210</x>
+     <y>90</y>
      <width>111</width>
-     <height>31</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
@@ -27,10 +27,13 @@
    </property>
   </widget>
   <widget class="QPushButton" name="btnWrite">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>270</y>
+     <x>660</x>
+     <y>190</y>
      <width>111</width>
      <height>31</height>
     </rect>
@@ -42,10 +45,10 @@
   <widget class="QTextEdit" name="txtIdentity">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>50</y>
+     <x>10</x>
+     <y>10</y>
      <width>311</width>
-     <height>31</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -58,8 +61,8 @@
   <widget class="QPlainTextEdit" name="txtReadData">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>130</y>
+     <x>340</x>
+     <y>50</y>
      <width>311</width>
      <height>131</height>
     </rect>
@@ -74,10 +77,10 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>10</y>
+     <x>210</x>
+     <y>120</y>
      <width>111</width>
-     <height>31</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
@@ -87,10 +90,10 @@
   <widget class="QTextEdit" name="txtVersion">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>10</y>
-     <width>311</width>
-     <height>31</height>
+     <x>10</x>
+     <y>50</y>
+     <width>310</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="placeholderText">
@@ -98,10 +101,13 @@
    </property>
   </widget>
   <widget class="QTextEdit" name="txtBlock">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>90</y>
+     <x>500</x>
+     <y>10</y>
      <width>151</width>
      <height>31</height>
     </rect>
@@ -114,10 +120,13 @@
    </property>
   </widget>
   <widget class="QTextEdit" name="txtSector">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>90</y>
+     <x>340</x>
+     <y>10</y>
      <width>151</width>
      <height>31</height>
     </rect>
@@ -130,10 +139,13 @@
    </property>
   </widget>
   <widget class="QTextEdit" name="txtWriteData">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>270</y>
+     <x>340</x>
+     <y>190</y>
      <width>311</width>
      <height>31</height>
     </rect>
@@ -143,10 +155,13 @@
    </property>
   </widget>
   <widget class="QPushButton" name="btnRead">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>90</y>
+     <x>660</x>
+     <y>10</y>
      <width>111</width>
      <height>31</height>
     </rect>
@@ -156,10 +171,13 @@
    </property>
   </widget>
   <widget class="QPushButton" name="btnPlus">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>130</y>
+     <x>660</x>
+     <y>50</y>
      <width>31</width>
      <height>31</height>
     </rect>
@@ -169,10 +187,13 @@
    </property>
   </widget>
   <widget class="QPushButton" name="btnMinus">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>130</y>
+     <x>700</x>
+     <y>50</y>
      <width>31</width>
      <height>31</height>
     </rect>

@@ -31,7 +31,8 @@ SOURCES += \
 
 HEADERS += \
     main_window.h \
-    reader_manager.h
+    reader_manager.h \
+    ODALID.h
 
 FORMS += \
     main_window.ui

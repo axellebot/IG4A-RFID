@@ -19,14 +19,23 @@ public:
 private slots:
     void on_btnConnect_clicked();
     void on_btnDisconnect_clicked();
+    void on_btnRead_clicked();
     void on_btnWrite_clicked();
     void on_btnPlus_clicked();
     void on_btnMinus_clicked();
+
+    void on_txtSector_textChanged();
+
+    void on_txtBlock_textChanged();
 
 private:
     Ui::MainWindow *ui;
     ReaderManager *readerManager;
     void closeEvent(QCloseEvent *bar);
+    void checkUIAvailability();
+    void setFieldEnabled(bool enable);
+    void setActionEnabled(bool enable);
+    void setIncrementActionEnabled(bool enable);
 };
 
 #endif // WIDGET_H
