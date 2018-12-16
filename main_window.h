@@ -19,13 +19,14 @@ public:
 private slots:
     void on_btnConnect_clicked();
     void on_btnDisconnect_clicked();
+
     void on_btnRead_clicked();
     void on_btnWrite_clicked();
+
     void on_btnPlus_clicked();
     void on_btnMinus_clicked();
 
     void on_txtSector_textChanged();
-
     void on_txtBlock_textChanged();
 
 private:

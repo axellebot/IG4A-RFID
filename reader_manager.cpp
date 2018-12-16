@@ -19,7 +19,7 @@ ReaderManager::ReaderManager()
     this->reader->Type = ReaderCDC;
     this->reader->device = 0;
 
-    this->connected=false;
+    this->connected=true;
 }
 
 ReaderManager::~ReaderManager(){
@@ -107,18 +107,6 @@ int ReaderManager::disconnectReader(){
     return status;
 }
 
-void ReaderManager::increment(int block){
-    status = Mf_Classic_Authenticate(reader, Auth_KeyB, FALSE, 3, KEY_D, 0);
-    status = Mf_Classic_Increment_Value(reader, FALSE, block, 1, block -1, Auth_KeyB, 0);
-    status = Mf_Classic_Restore_Value(reader, FALSE, block -1, block, Auth_KeyB, 0);
-}
-
-void ReaderManager::decrement(int block){
-    status = Mf_Classic_Authenticate(reader, Auth_KeyA, FALSE, 3, KEY_C, 0);
-    status = Mf_Classic_Decrement_Value(reader, FALSE, block, 1, block -1, Auth_KeyA, 0);
-    status = Mf_Classic_Restore_Value(reader, FALSE, block -1, block , Auth_KeyA, 0);
-}
-
 int ReaderManager::read(int sector,int block){
     unsigned char * KEY_ACCESS = getAccessKeyForSector(sector,false);
 
@@ -164,6 +152,17 @@ int ReaderManager::write(int sector,int block,char* value){
     return status;
 }
 
+void ReaderManager::increment(int block){
+    status = Mf_Classic_Authenticate(reader, Auth_KeyB, FALSE, 3, KEY_D, 0);
+    status = Mf_Classic_Increment_Value(reader, FALSE, block, 1, block -1, Auth_KeyB, 0);
+    status = Mf_Classic_Restore_Value(reader, FALSE, block -1, block, Auth_KeyB, 0);
+}
+
+void ReaderManager::decrement(int block){
+    status = Mf_Classic_Authenticate(reader, Auth_KeyA, FALSE, 3, KEY_C, 0);
+    status = Mf_Classic_Decrement_Value(reader, FALSE, block, 1, block -1, Auth_KeyA, 0);
+    status = Mf_Classic_Restore_Value(reader, FALSE, block -1, block , Auth_KeyA, 0);
+}
 
 char* ReaderManager::getId(){
     char tmp[uid_len];
@@ -189,6 +188,20 @@ char * ReaderManager::getData(){
     return value;
 }
 
+/**
+ * @brief ReaderManager::isConnected
+ * @return bool
+ */
+bool ReaderManager::isConnected(){
+    return this->connected;
+}
+
+/**
+ * @brief ReaderManager::getAccessKeyForSector
+ * @param sector
+ * @param writeAccess
+ * @return char* return key for sector depending on access
+ */
 unsigned char* ReaderManager::getAccessKeyForSector(int sector,bool writeAccess){
     unsigned char *KEY_ACCESS;
     switch(sector){
@@ -206,9 +219,3 @@ unsigned char* ReaderManager::getAccessKeyForSector(int sector,bool writeAccess)
     }
     return KEY_ACCESS;
 }
-
-bool ReaderManager::isConnected(){
-    return this->connected;
-}
-
-

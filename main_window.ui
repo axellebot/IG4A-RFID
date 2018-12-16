@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Widget</string>
+   <string>TP - RFID - LE BOT - BOUFENCHOUCHE</string>
   </property>
   <widget class="QPushButton" name="btnConnect">
    <property name="geometry">
